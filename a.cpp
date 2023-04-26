@@ -21,15 +21,22 @@ vector<vector<int>> board = { // neg means black pieces, 5 = rook, 4 = knight, 3
   {5, 4, 3, 9, 2, 3, 4, 5}
 };
 
-bool is_move_valid(string from, string to) {
-  int from_i, from_j, to_i, to_j;
-  from_i = N - (from[1] - '0');
-  from_j = from[0] - 'a';
-  to_i = N - (to[1] - '0');
-  to_j = to[0] - 'a';
-  int piece_val = abs(board[from_i][from_j]);
-  if (piece_val == 1) {
+vector<string> moves(int who) {
+  vector<string> ret;
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      if ()
+    }
   }
+}
+
+pair<int, string> minimax(int depth, int who) { // who: pos = white, neg = black
+  if (depth == MAX_DEPTH) return 0;
+  auto st_board = board;
+
+  
+
+  board = st_board;
 }
 
 int32_t main() {
@@ -41,6 +48,14 @@ int32_t main() {
       }
     }
     string from, to; cin >> from >> to;
-    if (is_move_valid(from, to) == false) continue;
+    int from_i, from_j, to_i, to_j;
+    from_i = N - (from[1] - '0');
+    from_j = from[0] - 'a';
+    to_i = N - (to[1] - '0');
+    to_j = to[0] - 'a';
+    board[to_i][to_j] = board[from_i][from_j];
+    board[from_i][from_j] = 0;
+
+    auto ret = minimax(0, -1);
   }
 }
