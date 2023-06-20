@@ -1,8 +1,10 @@
-var board = null;
-var game = new Chess();
+let board = null;
+let game = new Chess();
+
+let pieceVal = {"B": 3, "N": 3, "R": 5, "Q": 9}
 
 function makeRandomMove() {
-  var possibleMoves = game.moves();
+  let possibleMoves = game.moves();
 
   // exit if the game is over
   if (game.game_over()) {
@@ -11,11 +13,21 @@ function makeRandomMove() {
   }
 
   let captureMove = "-1";
+  let captureMoveVal = 0;
 
   possibleMoves.forEach((move) => {
     if (move[move.length - 3] == "x") {
       captureMove = move;
-      return;
+      let val = 1;
+      for (let i = 0; i < move.length; i++) {
+        if (move[i] == move[i].toUpperCase()) {
+          val = pieceVal[move[i]];
+          break;
+        }
+      }
+      if (captureMoveVal < val) {
+        captureMoveVal = val;
+      }
     }
   });
 
@@ -24,7 +36,7 @@ function makeRandomMove() {
   if (captureMove != "-1") {
     game.move(captureMove);
   } else {
-    var randomIdx = Math.floor(Math.random() * possibleMoves.length);
+    let randomIdx = Math.floor(Math.random() * possibleMoves.length);
     game.move(possibleMoves[randomIdx]);
   }
 
