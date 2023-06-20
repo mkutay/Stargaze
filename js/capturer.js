@@ -6,6 +6,7 @@ let pieceVal = {"B": 3, "N": 3, "R": 5, "Q": 9}
 function makeRandomMove() {
   let possibleMoves = game.moves();
 
+  // exit if the game is over
   if (game.game_over()) {
     console.log(game.pgn());
     return;
@@ -40,39 +41,9 @@ function makeRandomMove() {
   }
 
   board.position(game.fen());
+  window.setTimeout(makeRandomMove, 500);
 }
 
-function onDragStart (source, piece, position, orientation) {
-  if (game.game_over()) return false
+board = Chessboard("myBoard", "start");
 
-  if (piece.search(/^b/) !== -1) return false
-}
-
-function onDrop (source, target) {
-  var move = game.move({
-    from: source,
-    to: target,
-    promotion: 'q' // NOTE: always promote to a queen for simplicity
-  })
-
-  if (move === null) return 'snapback'
-
-  // make random legal move for black
-  window.setTimeout(makeRandomMove, 250)
-}
-
-// update the board position after the piece snap
-// for castling, en peasant, pawn promotion
-function onSnapEnd () {
-  board.position(game.fen())
-}
-
-var config = {
-  draggable: true,
-  position: 'start',
-  onDragStart: onDragStart,
-  onDrop: onDrop,
-  onSnapEnd: onSnapEnd
-}
-
-board = Chessboard("myBoard", config);
+window.setTimeout(makeRandomMove, 500);
