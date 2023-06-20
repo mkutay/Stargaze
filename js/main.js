@@ -2,23 +2,33 @@ var board = null;
 var game = new Chess();
 
 function makeRandomMove() {
-  // chess.js gives us all the possible moves in an array
-  // [ move1, move2, move3 ... ]
   var possibleMoves = game.moves();
 
   // exit if the game is over
-  if (game.game_over()) return;
+  if (game.game_over()) {
+    console.log(game.pgn());
+    return;
+  }
 
-  // choses a random index in the list
-  var randomIdx = Math.floor(Math.random() * possibleMoves.length);
+  let captureMove = "-1";
 
-  // updates javascript board state
-  game.move(possibleMoves[randomIdx]);
+  possibleMoves.forEach((move) => {
+    if (move[move.length - 3] == "x") {
+      captureMove = move;
+      return;
+    }
+  });
 
-  // changes html board state
+  console.log(captureMove);
+
+  if (captureMove != "-1") {
+    game.move(captureMove);
+  } else {
+    var randomIdx = Math.floor(Math.random() * possibleMoves.length);
+    game.move(possibleMoves[randomIdx]);
+  }
+
   board.position(game.fen());
-
-  // call this function again in 5 secs
   window.setTimeout(makeRandomMove, 500);
 }
 
