@@ -4,7 +4,7 @@ let game = new Chess();
 let pieceVal = {"b": 3, "n": 3, "r": 5, "q": 9, "p": 1, "k": 3.5};
 let moveLimit = 3;
 
-function minimax(moveCount, moveHistory) { // returns a list where the first element is the eval and the second element is the best move
+function minimax(moveCount) { // returns a list where the first element is the eval and the second element is the best move
   if (moveCount == moveLimit) {
     let eVal = 0;
     game.board().forEach((_) => {
@@ -17,7 +17,7 @@ function minimax(moveCount, moveHistory) { // returns a list where the first ele
         }
       });
     });
-    return [eVal, moveHistory];
+    return [-eVal, ""];
   }
 
   let possibleMoves = game.moves();
@@ -26,24 +26,25 @@ function minimax(moveCount, moveHistory) { // returns a list where the first ele
   let bestMove = null;
 
   if (game.in_checkmate()) {
-    return [-10000 * turn, moveHistory];
+    return [-10000 * turn, ""];
   }
 
   possibleMoves.forEach(possibleMove => {
     game.move(possibleMove);
-    moveHistory.push(possibleMove);
 
-    let madeMove = minimax(moveCount + 1, moveHistory);
+    let madeMove = minimax(moveCount + 1);
     madeMove[0] *= turn;
     if (bestMove == null || madeMove[0] > bestMove[0]) {
-      bestMove = madeMove;
+      bestMove = [madeMove[0], possibleMove];
     }
 
-    moveHistory.pop();
     game.undo();
   });
 
-  console.log(bestMove[1]);
+  if (bestMove == null) {
+    bestMove = [0, ""];
+  }
+
   return bestMove;
 }
 
@@ -53,11 +54,11 @@ function makeMove(lastMove) {
     return;
   }
 
-  bestMove = minimax(0, []);
+  bestMove = minimax(0);
 
   console.log(bestMove);
 
-  game.move(bestMove[1][0]);
+  game.move(bestMove[1]);
 
   board.position(game.fen());
 }
