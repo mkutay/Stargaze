@@ -1,43 +1,56 @@
 let board = null;
 let game = new Chess();
 
-let pieceVal = {"B": 3, "N": 3, "R": 5, "Q": 9}
+let pieceVal = {"b": 3, "n": 3, "r": 5, "q": 9, "p": 1, "k": 3.5};
+let moveLimit = 3;
 
-function makeRandomMove() {
+function minimax(moveCount, lastMove) { // returns a list where the first element is the eval and the second element is the best move
+  if (moveCount == moveLimit) {
+    let eVal = 0;
+    game.board().forEach((_) => {
+      _.forEach(move => {
+        if (move == null) return;
+        if (move.color == "w") {
+          eVal += pieceVal[move.type];
+        } else {
+          eVal -= pieceVal[move.type];
+        }
+      });
+    });
+    return [eVal, lastMove];
+  }
+
   let possibleMoves = game.moves();
 
+  let turn = (game.turn() == 'b' ? -1 : +1);
+  let bestMove = null
+
+  possibleMoves.forEach(possibleMove => {
+    game.move(possibleMove);
+
+    let madeMove = minimax(moveCount + 1, possibleMove);
+    madeMove[0] *= turn;
+    if (bestMove == null || madeMove[0] > bestMove[0]) {
+      bestMove = [madeMove[0], possibleMove];
+    }
+
+    game.undo();
+  });
+
+  return bestMove;
+}
+
+function makeMove(lastMove) {
   if (game.game_over()) {
     console.log(game.pgn());
     return;
   }
 
-  let captureMove = "-1";
-  let captureMoveVal = 0;
+  bestMove = minimax(0, lastMove);
 
-  possibleMoves.forEach((move) => {
-    if (move[move.length - 3] == "x") {
-      captureMove = move;
-      let val = 1;
-      for (let i = 0; i < move.length; i++) {
-        if (move[i] == move[i].toUpperCase()) {
-          val = pieceVal[move[i]];
-          break;
-        }
-      }
-      if (captureMoveVal < val) {
-        captureMoveVal = val;
-      }
-    }
-  });
+  console.log(bestMove);
 
-  console.log(captureMove);
-
-  if (captureMove != "-1") {
-    game.move(captureMove);
-  } else {
-    let randomIdx = Math.floor(Math.random() * possibleMoves.length);
-    game.move(possibleMoves[randomIdx]);
-  }
+  game.move(bestMove[1]);
 
   board.position(game.fen());
 }
@@ -58,7 +71,7 @@ function onDrop (source, target) {
   if (move === null) return 'snapback'
 
   // make random legal move for black
-  window.setTimeout(makeRandomMove, 250)
+  window.setTimeout(makeMove(move), 250)
 }
 
 // update the board position after the piece snap
