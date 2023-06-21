@@ -4,7 +4,7 @@ let game = new Chess();
 let pieceVal = {"b": 3, "n": 3, "r": 5, "q": 9, "p": 1, "k": 3.5};
 let moveLimit = 3;
 
-function minimax(moveCount, lastMove) { // returns a list where the first element is the eval and the second element is the best move
+function minimax(moveCount, moveHistory) { // returns a list where the first element is the eval and the second element is the best move
   if (moveCount == moveLimit) {
     let eVal = 0;
     game.board().forEach((_) => {
@@ -17,26 +17,33 @@ function minimax(moveCount, lastMove) { // returns a list where the first elemen
         }
       });
     });
-    return [eVal, lastMove];
+    return [eVal, moveHistory];
   }
 
   let possibleMoves = game.moves();
 
   let turn = (game.turn() == 'b' ? -1 : +1);
-  let bestMove = null
+  let bestMove = null;
+
+  if (game.in_checkmate()) {
+    return [-10000 * turn, moveHistory];
+  }
 
   possibleMoves.forEach(possibleMove => {
     game.move(possibleMove);
+    moveHistory.push(possibleMove);
 
-    let madeMove = minimax(moveCount + 1, possibleMove);
+    let madeMove = minimax(moveCount + 1, moveHistory);
     madeMove[0] *= turn;
     if (bestMove == null || madeMove[0] > bestMove[0]) {
-      bestMove = [madeMove[0], possibleMove];
+      bestMove = madeMove;
     }
 
+    moveHistory.pop();
     game.undo();
   });
 
+  console.log(bestMove[1]);
   return bestMove;
 }
 
@@ -46,11 +53,11 @@ function makeMove(lastMove) {
     return;
   }
 
-  bestMove = minimax(0, lastMove);
+  bestMove = minimax(0, []);
 
   console.log(bestMove);
 
-  game.move(bestMove[1]);
+  game.move(bestMove[1][0]);
 
   board.position(game.fen());
 }
@@ -71,7 +78,7 @@ function onDrop (source, target) {
   if (move === null) return 'snapback'
 
   // make random legal move for black
-  window.setTimeout(makeMove(move), 250)
+  window.setTimeout(makeMove(move.san), 250)
 }
 
 // update the board position after the piece snap
