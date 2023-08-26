@@ -5,4 +5,4 @@ I thought I just could create a _basic_ C++ code for the engine buuuut I soon fo
 
 --- 
 
-I plan to create a UCI compliant chess engine using Rust, to learn Rust.
+I plan to create a UCI compliant chess engine using C++ to improve my C++ skills.
